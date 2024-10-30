@@ -1,0 +1,35 @@
+<v-list class="catalog">
+      <v-list-group value="Smartphones">
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" class="category">Смартфоны</v-list-item>
+        </template>
+        <v-list-item
+          v-for="smartphone in smartphones"
+          :key="smartphone.id"
+          :value="smartphone.id"
+        >{{smartphone.title}}</v-list-item>
+        <v-list-group value="RelatedProducts">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" class="category">Сопутствующие товары</v-list-item>
+          </template>
+          <v-list-item
+            v-for="rel in related"
+            :key="rel.id"
+            :value="rel.id"
+          >{{rel.title}}</v-list-item>
+        </v-list-group>
+      </v-list-group>
+      
+      <v-list-group value="Audio">
+        <template v-slot:activator="{ props }">
+          <v-list-item v-bind="props" class="category">Аудиотехника</v-list-item>
+        </template>
+        <v-list-item
+          v-for="audio in audious"
+          :key="audio.id"
+          :value="audio.id"
+        >{{audio.title}}</v-list-item>
+
+      </v-list-group>
+      
+    </v-list>

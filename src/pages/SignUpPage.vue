@@ -79,7 +79,7 @@ let repPassword = ref("");
 
 function registUser() {
   if (password.value && login.value && repPassword.value == password.value) {
-    router.push("/main");
+    router.push("/");
   }
 }
 </script>
@@ -94,7 +94,7 @@ function registUser() {
 }
 
 .sigup-card {
-  margin-top: 50px;
+  margin-top: 10vh;
   width: 25vw;
   height: 50vh;
 }

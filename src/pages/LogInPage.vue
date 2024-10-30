@@ -64,8 +64,8 @@ function enterUser() {
 }
 
 .login-card {
-  margin-top: 50px;
-  height: 40vh;
+  margin-top: 25vh;
+  min-height: 30vh;
 }
 
 .log-in-form {
