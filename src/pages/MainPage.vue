@@ -1,6 +1,7 @@
 <template>
   <div class="main">
-    <v-dialog width="auto">
+    <div class="main-header">
+      <v-dialog width="auto">
       <template v-slot:activator="{ props: activatorProps }">
         <v-btn
           class="btn"
@@ -17,6 +18,8 @@
       </template>
     </v-dialog>
     <div>{{path}}</div>
+    </div>
+    
     <ProductList />
   </div>
 </template>

@@ -80,8 +80,8 @@ function formWay (title){
 
 function endType(type){
   path = mainpath + "/" + type.title;
-  console.log(path);
-  emit = ('click', path);
+  // console.log(path);
+  // emit = ('click', path);
 }
 
 </script>

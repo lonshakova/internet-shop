@@ -96,7 +96,7 @@ function registUser() {
 .sigup-card {
   margin-top: 10vh;
   width: 25vw;
-  height: 50vh;
+  min-height: 50vh;
 }
 
 .sigup-form {
