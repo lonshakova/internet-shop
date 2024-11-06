@@ -6,8 +6,8 @@
         <div>
           <v-text-field
           class="login"
-          label="Логин"
-          type="text"
+          label="Email"
+          type="email"
           required
           v-model="login"
         />
@@ -40,7 +40,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useProductStore } from "../store/productStore";
 
+const productStore = useProductStore();
 const router = useRouter();
 
 let isVisible = ref(false);
@@ -49,6 +51,7 @@ let password = ref("");
 
 function enterUser() {
   if (password.value && login.value) {
+    productStore.isEntered = !productStore.isEntered;
     router.push("/");
   }
 }
