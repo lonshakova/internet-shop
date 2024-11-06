@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="btns">
-    <v-btn append-icon="mdi-cart-variant" class="icon"
+    <v-btn append-icon="mdi-cart-variant" class="icon" @click="$router.push('/basket')"
       >Корзина ({{ totalBasket }})
       <template v-slot:append>
         <v-icon color="var(--icons-color)" size="25px" />

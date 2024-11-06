@@ -7,7 +7,8 @@ export const useProductStore = defineStore({
     surnameUser: "Пончиков",
     isEntered: true,
     isLowerFirst: true,
-    basket: 0,
+    basket: [],
+    basketForBuying: [],
     products: [{
       name: "Смартфон Apple iPhone 14",
       description:
@@ -16,6 +17,7 @@ export const useProductStore = defineStore({
       quantity: 8,
       price: 62790,
       basket: 0,
+      id: 1,
     },
     {
       name: "Смартфон Apple iPhone 13",
@@ -25,15 +27,17 @@ export const useProductStore = defineStore({
       quantity: 3,
       price: 58890,
       basket: 0,
+      id: 2,
     },
     {
       name: "Смартфон Samsung Galaxy S8",
       description:
         "В этой модели установлена основная камера с разрешением 12 Мп и фронтальный модуль на 8 Мп. Устройство поддерживает запись видео в качестве 4K с частотой 30 кадров в секунду. Основной объектив имеет диафрагму f/1.7, что позволяет делать качественные снимки даже при слабом освещении. Корпус защищён стеклом Gorilla Glass, обеспечивающим дополнительную прочность и защиту от повреждений.",
       img: "https://www.iqmac.ru/upload/iblock/e37/1.jpg",
-      quantity: 0,
+      quantity: 1,
       price: 24000,
       basket: 0,
+      id: 3,
     },
     {
       name: "Наушники Apple AirPods Pro",
@@ -43,6 +47,7 @@ export const useProductStore = defineStore({
       quantity: 10,
       price: 21000,
       basket: 0,
+      id: 4,
     },
     {
       name: "Чехол для Huawei P50",
@@ -52,15 +57,17 @@ export const useProductStore = defineStore({
       quantity: 4,
       price: 688,
       basket: 0,
+      id: 5,
     },
     {
       name: "Смартфон Huawei P50",
       description:
         "В этой модели установлены три основные камеры (48Мп, 12 Мп и 12 Мп) и фронтальный модуль (7 Мп), можно записывать видео в качестве 4К  с частотой 30 кадров в секунду. Основной широкоугольный объектив снабжён сапфировым защитным стеклом.",
       img: "https://cdn1.ozone.ru/s3/multimedia-n/6459263075.jpg",
-      quantity: 0,
+      quantity: 1,
       price: 59999,
       basket: 0,
+      id: 6,
     }]
   }),
 })

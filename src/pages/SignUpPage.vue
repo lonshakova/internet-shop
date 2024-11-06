@@ -1,21 +1,21 @@
 <template>
   <div class="sigup-page">
     <v-card class="sigup-card" elevation="16">
-      <v-form class="sigup-form">
+      <v-form class="sigup-form" v-if="!isSuccess">
         <div>
           <div class="name-and-surname">
             <v-text-field
               class="input"
               label="Имя"
               type="text"
-              v-model="login"
+              v-model="name"
               :rules="[rules.required]"
             />
             <v-text-field
               class="input"
               label="Фамилия"
               type="text"
-              v-model="login"
+              v-model="surname"
               :rules="[rules.required]"
             />
           </div>
@@ -50,11 +50,18 @@
           <v-btn class="btn" variant="plain" @click="$router.push('/login')"
             >Назад</v-btn
           >
-          <v-btn class="btn" variant="plain" @click="registUser()" color="#FF3C00"
+          <v-btn
+            class="btn"
+            variant="plain"
+            @click="registUser()"
+            color="#FF3C00"
             >Регистрация</v-btn
           >
         </div>
       </v-form>
+      <div v-else class="success-reg">Регистрация прошла успешно!
+        <v-icon icon="mdi-party-popper" />
+      </div>
     </v-card>
   </div>
 </template>
@@ -62,7 +69,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useProductStore } from "../store/productStore";
 
+const productStore = useProductStore();
 const router = useRouter();
 
 let rules = ref({
@@ -73,13 +82,18 @@ let rules = ref({
 });
 let isVisible = ref(false);
 let isVisibleRep = ref(false);
+let isSuccess = ref(false);
+let name = ref("");
+let surname = ref("");
 let login = ref("");
 let password = ref("");
 let repPassword = ref("");
 
-function registUser() {
+async function registUser() {
   if (password.value && login.value && repPassword.value == password.value) {
-    router.push("/");
+    isSuccess.value = !isSuccess.value;
+    productStore.isEntered = true;
+    setTimeout(() => router.push("/"), 1000);
   }
 }
 </script>
@@ -118,4 +132,10 @@ function registUser() {
   justify-content: flex-end;
 }
 
+.success-reg {
+  margin-top: 40%;
+  color: #1e8449;
+  text-align: center;
+  font-size: xx-large;
+}
 </style>
