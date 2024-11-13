@@ -5,10 +5,12 @@ export const useProductStore = defineStore({
   state: () => ({
     nameUser: "Борис",
     surnameUser: "Пончиков",
-    isEntered: true,
+    isEntered: false,
     isLowerFirst: true,
+    isAdmin: true,
     basket: [],
     basketForBuying: [],
+    availabilitysSelection: ["В наличии", "Мало"],
     products: [{
       name: "Смартфон Apple iPhone 14",
       description:
@@ -34,7 +36,7 @@ export const useProductStore = defineStore({
       description:
         "В этой модели установлена основная камера с разрешением 12 Мп и фронтальный модуль на 8 Мп. Устройство поддерживает запись видео в качестве 4K с частотой 30 кадров в секунду. Основной объектив имеет диафрагму f/1.7, что позволяет делать качественные снимки даже при слабом освещении. Корпус защищён стеклом Gorilla Glass, обеспечивающим дополнительную прочность и защиту от повреждений.",
       img: "https://www.iqmac.ru/upload/iblock/e37/1.jpg",
-      quantity: 1,
+      quantity: 0,
       price: 24000,
       basket: 0,
       id: 3,
@@ -64,10 +66,20 @@ export const useProductStore = defineStore({
       description:
         "В этой модели установлены три основные камеры (48Мп, 12 Мп и 12 Мп) и фронтальный модуль (7 Мп), можно записывать видео в качестве 4К  с частотой 30 кадров в секунду. Основной широкоугольный объектив снабжён сапфировым защитным стеклом.",
       img: "https://cdn1.ozone.ru/s3/multimedia-n/6459263075.jpg",
-      quantity: 1,
+      quantity: 0,
       price: 59999,
       basket: 0,
       id: 6,
     }]
   }),
+  getters: {
+    sortedProducts(state) {
+      if (state.isLowerFirst) {
+        return state.products.sort((prod1, prod2) => prod1.price - prod2.price);
+      }
+      else {
+        return state.products.sort((prod1, prod2) => prod2.price - prod1.price);
+      }
+    }
+  }
 })

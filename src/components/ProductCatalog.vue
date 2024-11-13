@@ -48,7 +48,6 @@
 
 <script setup>
 import { ref } from "vue";
-import { defineEmits } from "vue";
 
 let smartphones = ref([
   { title: "Все", value: "", id: 0 },
@@ -67,7 +66,6 @@ let audious = ref([
 ]);
 let path = "";
 let mainpath = "";
-let emit = defineEmits(['addPath']);
 
 function formWay (title){
   if (title != 'Сопутствующие товары') {
@@ -80,8 +78,6 @@ function formWay (title){
 
 function endType(type){
   path = mainpath + "/" + type.title;
-  // console.log(path);
-  // emit = ('click', path);
 }
 
 </script>

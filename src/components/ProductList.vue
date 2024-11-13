@@ -3,7 +3,7 @@
     <div class="category-filter">
       <div class="category">
         Главная<span style="color: grey"
-          >({{ productStore.products.length }})</span
+          >({{ productStore.sortedProducts.length }})</span
         >
       </div>
       <div class="filters-and-sort">
@@ -14,26 +14,17 @@
           size="small"
           :append-icon="
             productStore.isLowerFirst
-              ? 'mdi-sort-ascending'
-              : 'mdi-sort-descending'
+              ? 'mdi-sort-reverse-variant'
+              : 'mdi-sort-variant'
           "
           :text="
             productStore.isLowerFirst ? 'Сначала дешевле' : 'Сначала дороже'
           "
           @click="productStore.isLowerFirst = !productStore.isLowerFirst"
         ></v-btn>
-        <div class="filter">
-          <v-select
-            clearable
-            label="Фильтры"
-            width="20vh"
-            :items="['1', '2', '3', '4', '5', '6']"
-            variant="underlined"
-          ></v-select>
-        </div>
       </div>
     </div>
-    <div class="list" v-for="product in productStore.products">
+    <div class="list" v-for="product in productStore.sortedProducts">
       <ProductCard :product="product" />
     </div>
   </div>
@@ -48,7 +39,7 @@ const productStore = useProductStore();
 
 <style lang="scss" scoped>
 .content {
-  width: 85vw;
+  width: 70vw;
 }
 
 .category-filter {

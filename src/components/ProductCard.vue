@@ -1,7 +1,10 @@
 <template>
   <div>
     <v-divider />
-    <div class="product-card">
+    <div
+      class="product-card"
+      @click.stop="$router.push(`/product/${product.id}`)"
+    >
       <v-img class="img" :src="product.img" />
       <div class="name-and-description">
         <div class="name">{{ product.name }}</div>
@@ -34,7 +37,7 @@
               v-bind="props"
               :color="isHovering ? '#FF3C00' : undefined"
               v-if="product.quantity > 0 && product.basket == 0"
-              @click="addProdutToBasket(product)"
+              @click.stop="addProdutToBasket(product)"
               >В корзину</v-btn
             >
           </template>
@@ -42,23 +45,20 @@
         <div class="basket-btns" v-if="product.basket > 0">
           <v-btn
             class="btn"
-            v-if="product.quantity != 0"
+            v-if="product.basket > 0"
             size="small"
             rounded="0"
             icon="mdi-minus"
-            @click="
-              product.basket--;
-              product.quantity++;
-            "
+            @click.stop="deleteProduct(product)"
           />
           <span class="basket">{{ product.basket }}</span>
           <v-btn
             class="btn"
-            v-if="product.basket > 0"
+            v-if="product.quantity > 0"
             size="small"
             rounded="0"
             icon="mdi-plus"
-            @click="
+            @click.stop="
               product.basket++;
               product.quantity--;
             "
@@ -82,6 +82,15 @@ function addProdutToBasket(product) {
   product.quantity--;
   productStore.basket.push(product);
 }
+
+function deleteProduct(product) {
+  product.basket--;
+  product.quantity++;
+  console.log(productStore.basket);
+  if (product.basket == 0) {
+    productStore.basket = productStore.basket.filter((p) => p.id != product.id);
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -91,6 +100,7 @@ function addProdutToBasket(product) {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
 }
 
 .img {

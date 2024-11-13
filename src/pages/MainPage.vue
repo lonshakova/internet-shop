@@ -17,16 +17,19 @@
           <ProductCatalog />
         </template>
       </v-dialog>
-
       <div class="path">Главная/</div>
     </div>
-    <ProductList />
+    <div class="main-content">
+      <div><FilterList /></div>
+      <div><ProductList /></div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import ProductList from "../components/ProductList.vue";
 import ProductCatalog from "../components/ProductCatalog.vue";
+import FilterList from "../components/FilterList.vue";
 
 import { ref } from "vue";
 import { useProductStore } from "../store/productStore";
@@ -42,17 +45,12 @@ const handleEmit = (path) => {
 
 <style lang="scss" scoped>
 .main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+
 }
 
 .main-header {
   margin: 1vh;
-
   display: flex;
-  align-self: flex-start;
   align-items: center;
 }
 
@@ -66,5 +64,8 @@ const handleEmit = (path) => {
   color: grey;
 }
 
-
+.main-content {
+  display: flex;
+  gap: 5vw;
+}
 </style>

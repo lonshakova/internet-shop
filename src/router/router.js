@@ -4,6 +4,7 @@ import MainPage from "../pages/MainPage.vue";
 import LogInPage from "../pages/LogInPage.vue";
 import SignUpPage from "../pages/SignUpPage.vue";
 import BasketPage from "../pages/BasketPage.vue";
+import ProductPage from "../pages/ProductPage.vue";
 
 const routes = [
   {
@@ -21,6 +22,10 @@ const routes = [
   {
     path: '/basket',
     component: BasketPage
+  },
+  {
+    path: '/product/:id',
+    component: ProductPage
   },
 ];
 const router = createRouter({
