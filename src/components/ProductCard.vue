@@ -1,81 +1,94 @@
 <template>
-  <div>
-    <v-divider />
-    <div
-      class="product-card"
-      @click.stop="$router.push(`/product/${product.id}`)"
-    >
-      <v-img class="img" :src="product.img" />
-      <div class="name-and-description">
-        <div class="name">{{ product.name }}</div>
-        <div class="description">{{ product.description }}</div>
-      </div>
-      <div class="status">
-        <span v-if="product.quantity >= 5" style="color: #1e8449"
-          >В наличии</span
-        >
-        <span
-          v-if="product.quantity < 5 && product.quantity > 0"
-          style="color: #ffc300"
-          >Мало</span
-        >
-        <span v-if="product.quantity == 0" style="color: #c70039"
-          >Нет в наличии</span
-        >
-      </div>
-      <div class="price-and-btn">
-        <div class="price">
-          <span v-if="!productStore.isEntered">{{ product.price }}</span>
-          <span v-else
-            >{{ Math.round(product.price * 0.8) }}
-            <del id="old-price">{{ product.price }}</del></span
+  <v-hover>
+    <template v-slot:default="{ isHovering, props }">
+      <v-card
+        v-bind="props"
+        :elevation="isHovering ? 12 : 1"
+        class="product-card"
+        @click.stop="$router.push(`/product/${product.id}`)"
+      >
+        <v-img class="img" :src="product.img" />
+        <div class="name-and-description">
+          <div class="name-and-rate">
+            <div class="name">{{ product.name }}</div>
+            <div class="rate"><v-icon icon="mdi-star" size="default" color="#FF3C00"/>{{ rate }}</div>
+          </div>
+          <div class="description">{{ product.description }}</div>
+        </div>
+        <div class="status">
+          <span v-if="product.quantity >= 5" style="color: #1e8449"
+            >В наличии</span
+          >
+          <span
+            v-if="product.quantity < 5 && product.quantity > 0"
+            style="color: #ffc300"
+            >Мало</span
+          >
+          <span v-if="product.quantity == 0" style="color: #c70039"
+            >Нет в наличии</span
           >
         </div>
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              v-bind="props"
-              :color="isHovering ? '#FF3C00' : undefined"
-              v-if="product.quantity > 0 && product.basket == 0"
-              @click.stop="addProdutToBasket(product)"
-              >В корзину</v-btn
+        <div class="price-and-btn">
+          <div class="price">
+            <span v-if="!productStore.isEntered">{{ product.price }}</span>
+            <span v-else
+              >{{ Math.round(product.price * 0.8) }}
+              <del id="old-price">{{ product.price }}</del></span
             >
-          </template>
-        </v-hover>
-        <div class="basket-btns" v-if="product.basket > 0">
-          <v-btn
-            class="btn"
-            v-if="product.basket > 0"
-            size="small"
-            rounded="0"
-            icon="mdi-minus"
-            @click.stop="deleteProduct(product)"
-          />
-          <span class="basket">{{ product.basket }}</span>
-          <v-btn
-            class="btn"
-            v-if="product.quantity > 0"
-            size="small"
-            rounded="0"
-            icon="mdi-plus"
-            @click.stop="
-              product.basket++;
-              product.quantity--;
-            "
-          />
+          </div>
+          <v-hover>
+            <template v-slot:default="{ isHovering, props }">
+              <v-btn
+                v-bind="props"
+                :color="isHovering ? '#FF3C00' : undefined"
+                v-if="product.quantity > 0 && product.basket == 0"
+                @click.stop="addProdutToBasket(product)"
+                >В корзину</v-btn
+              >
+            </template>
+          </v-hover>
+          <div class="basket-btns" v-if="product.basket > 0">
+            <v-btn
+              class="btn"
+              v-if="product.basket > 0"
+              size="small"
+              rounded="0"
+              icon="mdi-minus"
+              @click.stop="deleteProduct(product)"
+            />
+            <span class="basket">{{ product.basket }}</span>
+            <v-btn
+              class="btn"
+              v-if="product.quantity > 0"
+              size="small"
+              rounded="0"
+              icon="mdi-plus"
+              @click.stop="
+                product.basket++;
+                product.quantity--;
+              "
+            />
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </v-card>
+    </template>
+  </v-hover>
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { computed, defineProps } from "vue";
 import { useProductStore } from "../store/productStore";
 
 const productStore = useProductStore();
 
 const props = defineProps({ product: { type: Object, required: true } });
+const rate = computed( function() {
+  let sum = 0;
+  for (let comment of props.product.comments) {
+    sum += +comment.rate;
+  }
+  return (Math.round(sum/props.product.comments.length)) 
+})
 
 function addProdutToBasket(product) {
   product.basket++;
@@ -95,6 +108,7 @@ function deleteProduct(product) {
 
 <style lang="scss" scoped>
 .product-card {
+  margin: 1vh 0;
   min-height: 20vh;
   padding: 0 5vw;
   display: flex;
@@ -115,8 +129,14 @@ function deleteProduct(product) {
   width: 30vw;
 }
 
-.name {
+.name-and-rate {
+  width: 30vw;
+  display: flex;
+  align-items: center;
   font-size: x-large;
+}
+
+.name {
   font-weight: 600;
 }
 

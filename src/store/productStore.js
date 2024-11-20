@@ -5,12 +5,28 @@ export const useProductStore = defineStore({
   state: () => ({
     nameUser: "Борис",
     surnameUser: "Пончиков",
-    isEntered: false,
+    isEntered: true,
     isLowerFirst: true,
     isAdmin: true,
     basket: [],
     basketForBuying: [],
     availabilitysSelection: ["В наличии", "Мало"],
+    filters:[{
+      name: "Наличие",
+      selecton:["В наличии", "Мало"],  
+      items: ["В наличии", "Мало", "Нет в наличии"]
+    },
+    {
+      name: "Цена",
+      selecton:["до 1000", "1001-5000", "5001-10000","10001-50000","от 50000"],  
+      items: ["до 1000", "1001-5000", "5001-10000","10001-50000","от 50000"]
+    },
+    {
+      name: "Гарантия",
+      selecton:["В наличии", "Мало"],  
+      items: ["Есть", "Нет"]
+    },
+  ],
     products: [{
       name: "Смартфон Apple iPhone 14",
       description:
@@ -20,6 +36,25 @@ export const useProductStore = defineStore({
       price: 62790,
       basket: 0,
       id: 1,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"https://udoba.org/sites/default/files/h5p/content/80704/images/image-64492edeab42e.jpg",
+        text:"",
+        rate:"5",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"А здесь только текст",
+        rate:"4",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"1",
+      },
+    ]
     },
     {
       name: "Смартфон Apple iPhone 13",
@@ -30,6 +65,25 @@ export const useProductStore = defineStore({
       price: 58890,
       basket: 0,
       id: 2,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"А здесь только текст",
+        rate:"1",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"https://a-a-ah-ru.s3.amazonaws.com/uploads/items/153611/319902/large_s1200.jpg",
+        text:"Сегодня тут будут только куницы",
+        rate:"3",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"2",
+      },
+    ]
     },
     {
       name: "Смартфон Samsung Galaxy S8",
@@ -40,6 +94,25 @@ export const useProductStore = defineStore({
       price: 24000,
       basket: 0,
       id: 3,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"А здесь только текст",
+        rate:"5",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"1",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"https://faunistics.com/wp-content/uploads/2020/01/1-5.jpg",
+        text:"",
+        rate:"2",
+      },
+    ]
     },
     {
       name: "Наушники Apple AirPods Pro",
@@ -50,6 +123,25 @@ export const useProductStore = defineStore({
       price: 21000,
       basket: 0,
       id: 4,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"https://avatars.mds.yandex.net/i?id=2655e806052e59ba3a2c852dfffa6916_l-5369205-images-thumbs&n=13",
+        text:"Сегодня тут будут только куницы",
+        rate:"1",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"А здесь только текст",
+        rate:"2",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"3",
+      },
+    ]
     },
     {
       name: "Чехол для Huawei P50",
@@ -60,6 +152,25 @@ export const useProductStore = defineStore({
       price: 688,
       basket: 0,
       id: 5,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"А здесь только текст",
+        rate:"5",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"https://i.ytimg.com/vi/BODa7i57CDU/maxresdefault.jpg",
+        text:"Сегодня тут будут только куницы",
+        rate:"4",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"5",
+      },
+    ]
     },
     {
       name: "Смартфон Huawei P50",
@@ -70,6 +181,25 @@ export const useProductStore = defineStore({
       price: 59999,
       basket: 0,
       id: 6,
+      comments:[{
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"5",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"",
+        text:"",
+        rate:"5",
+      },
+      {
+        nameUser:"Борис Пончиков",
+        img:"https://avatars.mds.yandex.net/i?id=8dd162b6c2705a7539bc699b260ce8ad_l-8231149-images-thumbs&n=13",
+        text:"Сегодня тут будут только куницы",
+        rate:"5",
+      },
+    ]
     }]
   }),
   getters: {
