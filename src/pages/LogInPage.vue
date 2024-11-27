@@ -9,13 +9,13 @@
           label="Email"
           type="email"
           required
-          v-model="login"
+          v-model="user.email"
         />
         <v-text-field
           class="password"
           label="Пароль"
           required
-          v-model="password"
+          v-model="user.password"
           :type="isVisible ? 'text' : 'password'"
           :append-inner-icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append-inner="isVisible = !isVisible"
@@ -30,7 +30,7 @@
             color="#FF3C00"
             >Регистрация</v-btn
           >
-          <v-btn class="btn" variant="plain" @click="enterUser()">Вход</v-btn>
+          <v-btn class="btn" variant="plain" @click="enterUser(user)">Вход</v-btn>
         </div>
       </v-form>
     </v-card>
@@ -40,21 +40,35 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useProductStore } from "../store/productStore";
 
-const productStore = useProductStore();
+import { useUserStore } from "../store/userStore";
+
+const userStore = useUserStore();
 const router = useRouter();
 
-let isVisible = ref(false);
-let login = ref("");
-let password = ref("");
 
-function enterUser() {
-  if (password.value && login.value) {
-    productStore.isEntered = !productStore.isEntered;
-    router.push("/");
-  }
-}
+let isVisible = ref(false);
+const user = ref({
+      id:null,
+      name:"",
+      surname:"",
+      email:"",
+      password:"",
+      isAdmin:false,
+    })
+
+function enterUser(user) {
+      let ind;
+      for (ind in userStore.users){
+        if (userStore.users[ind].email == user.email && userStore.users[ind].password == user.password){
+          userStore.enterUser = userStore.users[ind];
+          userStore.isEntered = true;
+          router.push('/');
+          break
+        }
+      }
+    }
+
 </script>
 
 <style lang="scss" scoped>

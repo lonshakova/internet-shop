@@ -31,22 +31,9 @@ import ProductList from "../components/ProductList.vue";
 import ProductCatalog from "../components/ProductCatalog.vue";
 import FilterList from "../components/FilterList.vue";
 
-import { ref } from "vue";
-import { useProductStore } from "../store/productStore";
-
-const productStore = useProductStore();
-
-let isCatalogVisible = ref(false);
-let path = ref("");
-const handleEmit = (path) => {
-  console.log(path);
-};
 </script>
 
 <style lang="scss" scoped>
-.main {
-
-}
 
 .main-header {
   margin: 1vh;

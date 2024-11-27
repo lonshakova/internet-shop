@@ -7,11 +7,22 @@
         class="product-card"
         @click.stop="$router.push(`/product/${product.id}`)"
       >
+        <v-btn
+          v-if="userStore.enterUser.isAdmin"
+          class="admin-btns"
+          icon="mdi-close"
+          variant="plain"
+          @click.stop="productStore.deleteProduct(product)"
+        />
         <v-img class="img" :src="product.img" />
         <div class="name-and-description">
           <div class="name-and-rate">
             <div class="name">{{ product.name }}</div>
-            <div class="rate"><v-icon icon="mdi-star" size="default" color="#FF3C00"/>{{ rate }}</div>
+            <div class="rate">
+              <v-icon icon="mdi-star" size="default" color="#FF3C00" />{{
+                rate
+              }}
+            </div>
           </div>
           <div class="description">{{ product.description }}</div>
         </div>
@@ -30,7 +41,7 @@
         </div>
         <div class="price-and-btn">
           <div class="price">
-            <span v-if="!productStore.isEntered">{{ product.price }}</span>
+            <span v-if="!userStore.isEntered">{{ product.price }}</span>
             <span v-else
               >{{ Math.round(product.price * 0.8) }}
               <del id="old-price">{{ product.price }}</del></span
@@ -78,17 +89,19 @@
 <script setup>
 import { computed, defineProps } from "vue";
 import { useProductStore } from "../store/productStore";
+import { useUserStore } from "../store/userStore";
 
 const productStore = useProductStore();
+const userStore = useUserStore();
 
 const props = defineProps({ product: { type: Object, required: true } });
-const rate = computed( function() {
+const rate = computed(function () {
   let sum = 0;
   for (let comment of props.product.comments) {
     sum += +comment.rate;
   }
-  return (Math.round(sum/props.product.comments.length)) 
-})
+  return Math.round(sum / props.product.comments.length);
+});
 
 function addProdutToBasket(product) {
   product.basket++;
@@ -110,11 +123,17 @@ function deleteProduct(product) {
 .product-card {
   margin: 1vh 0;
   min-height: 20vh;
-  padding: 0 5vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+}
+
+.admin-btns {
+  align-self: flex-start;
+  justify-self: flex-start;
+  width: fit-content;
+  color: #ff3c00;
 }
 
 .img {

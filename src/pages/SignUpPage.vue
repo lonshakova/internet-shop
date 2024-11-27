@@ -8,14 +8,14 @@
               class="input"
               label="Имя"
               type="text"
-              v-model="name"
+              v-model="user.name"
               :rules="[rules.required]"
             />
             <v-text-field
               class="input"
               label="Фамилия"
               type="text"
-              v-model="surname"
+              v-model="user.surname"
               :rules="[rules.required]"
             />
           </div>
@@ -23,7 +23,7 @@
             class="login"
             label="Email"
             type="email"
-            v-model="login"
+            v-model="user.email"
             :rules="[rules.required]"
           />
           <v-text-field
@@ -34,7 +34,7 @@
             :type="isVisible ? 'text' : 'password'"
             :append-inner-icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append-inner="isVisible = !isVisible"
-            v-model="password"
+            v-model="user.password"
           />
           <v-text-field
             class="password"
@@ -52,14 +52,16 @@
           >
           <v-btn
             class="btn"
-            variant="plain"
+            :variant="isformReady ? 'text' : 'plain'"
+            :disabled="!isformReady"
             @click="registUser()"
-            color="#FF3C00"
+            :color="isformReady ? '#FF3C00' : 'default'"
             >Регистрация</v-btn
           >
         </div>
       </v-form>
-      <div v-else class="success-reg">Регистрация прошла успешно!
+      <div v-else class="success-reg">
+        Регистрация прошла успешно!
         <v-icon icon="mdi-party-popper" />
       </div>
     </v-card>
@@ -67,32 +69,57 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { useProductStore } from "../store/productStore";
-
-const productStore = useProductStore();
+import { useUserStore } from "../store/userStore";
+const userStore = useUserStore();
 const router = useRouter();
 
 let rules = ref({
   required: (value) => !!value || "Обязательно для заполнения",
   min: (v) => v.length >= 8 || "Минимум 8 символов",
   repeatMatch: () =>
-    !!(password.value == repPassword.value) || "Пароли не совпадают",
+    !!(user.value.password == repPassword.value) || "Пароли не совпадают",
 });
 let isVisible = ref(false);
 let isVisibleRep = ref(false);
 let isSuccess = ref(false);
-let name = ref("");
-let surname = ref("");
-let login = ref("");
-let password = ref("");
+let isformReady = computed (() => {
+  return user.value.name && user.value.surname && user.value.email && user.value.password;
+})
+const user = ref({
+  id: null,
+  name: "",
+  surname: "",
+  email: "",
+  password: "",
+  isAdmin: false,
+});
 let repPassword = ref("");
 
 async function registUser() {
-  if (password.value && login.value && repPassword.value == password.value) {
+  let isError = false;
+  for (let ind in userStore.users) {
+    if (userStore.users[ind].email == user.value.email) {
+      alert("Такой пользователь уже зарегестрирован!");
+      isError = true;
+      break;
+    }
+  }
+  if (!isError) {
+    user.value.id = Date.now();
     isSuccess.value = !isSuccess.value;
-    productStore.isEntered = true;
+    userStore.isEntered = true;
+    userStore.users.push(user.value);
+    userStore.enterUser = user.value;
+    user.value = {
+      id: null,
+  name: "",
+  surname: "",
+  email: "",
+  password: "",
+  isAdmin: false,
+    }
     setTimeout(() => router.push("/"), 1000);
   }
 }

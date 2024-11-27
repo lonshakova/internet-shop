@@ -11,6 +11,28 @@
         </div>
         <div class="description">{{ product.description }}</div>
       </div>
+      <div class="admin-btns" v-if="userStore.enterUser.isAdmin">
+        <v-hover>
+          <template v-slot:default="{ isHovering, props }">
+            <v-btn v-bind="props" :color="isHovering ? '#FF3C00' : undefined"
+              >Редактировать</v-btn
+            >
+          </template>
+        </v-hover>
+        <v-hover>
+          <template v-slot:default="{ isHovering, props }">
+            <v-btn
+              v-bind="props"
+              :color="isHovering ? '#FF3C00' : undefined"
+              @click="
+                productStore.deleteProduct(product);
+                $router.push(`/`);
+              "
+              >Удалить</v-btn
+            >
+          </template>
+        </v-hover>
+      </div>
 
       <div class="price-and-btn">
         <div class="price">
@@ -71,62 +93,12 @@
     <div class="comments">
       <div class="comments-header">
         <h2>Комментарии</h2>
-
-        <v-dialog>
-          <template v-slot:activator="{ props: activatorProps }">
-            <v-btn class="new-comment-btn" v-bind="activatorProps" v-if="productStore.isEntered"
-              >Добавить комментарий</v-btn
-            >
-          </template>
-          <template v-slot:default="{ isActive }">
-            <v-card class="new-comment">
-              <div class="stars">
-                <div v-for="i in 5">
-                  <v-icon
-                    icon="mdi-star"
-                    color="#FF3C00"
-                    v-if="i <= newComment.rate"
-                    @click="newComment.rate = i"
-                  />
-                  <v-icon
-                    color="#FF3C00"
-                    v-if="i > newComment.rate"
-                    icon="mdi-star-outline"
-                    @click="newComment.rate = i"
-                  />
-                </div>
-              </div>
-
-              <v-file-input
-                class="img-input"
-                label="Вставьте картинку"
-                accept="image/*"
-                v-model="newComment.img"
-              />
-              <v-textarea
-                class="text-input"
-                no-resize
-                rows="4"
-                auto-grow
-                label="Напишите комментарий"
-                v-model="newComment.text"
-              />
-              <v-btn
-                @click="
-                  isActive.value = false;
-                  addComment();
-                "
-                :readonly="newComment.rate != 0 ? false : true"
-                :variant="newComment.rate != 0 ? 'elevated' : 'tonal'"
-                >Добавить комментарий</v-btn
-              >
-            </v-card>
-          </template>
-        </v-dialog>
+        <NewComment :product="product"/>
       </div>
       <div v-for="comment in product.comments">
         <v-card class="comment" elevation="12">
-          <div class="nameUser">{{ comment.nameUser }}</div>
+          <div class="nameUser" v-if="comment.user_id==userStore.enterUser.id">Ваш комментарий</div>
+          <div class="nameUser" v-else>{{ comment.nameUser }}</div>
           <div class="comment-content">
             <div class="text-and-rate">
               <div class="rate">
@@ -139,7 +111,34 @@
               </div>
               <div class="text" v-if="comment.text">{{ comment.text }}</div>
             </div>
-            <v-img class="comment-img" v-if="comment.img" :src="comment.img" />
+            <div class="comment-imgs">
+              <v-dialog max-width="700">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-img
+                    v-bind="activatorProps"
+                    class="comment-img"
+                    v-if="comment.img[0]"
+                    :elevation="comment.img.length"
+                    :src="comment.img[0]"
+                  />
+                </template>
+                <template v-slot:default="{ isActive }">
+                  <v-carousel
+                    hide-delimiters
+                    :show-arrows="comment.img.length > 1 ? 'hover' : false"
+                  >
+                    <v-carousel-item
+                      v-for="(img, i) in comment.img"
+                      :key="i"
+                      :src="img"
+                    ></v-carousel-item>
+                  </v-carousel>
+                </template>
+              </v-dialog>
+              <div v-if="comment.img.length > 1">
+                +{{ comment.img.length - 1 }}
+              </div>
+            </div>
           </div>
         </v-card>
       </div>
@@ -148,19 +147,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import NewComment from "../components/NewComment.vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useProductStore } from "../store/productStore";
+import { useUserStore } from "../store/userStore";
 
 const productStore = useProductStore();
+const userStore = useUserStore();
 const route = useRoute();
 
-const newComment = ref({
-  nameUser: productStore.nameUser + " " + productStore.surnameUser,
-  img: null,
-  text: "",
-  rate: 0,
-});
 
 const product = computed(function () {
   return productStore.products.find(function (product) {
@@ -189,17 +185,6 @@ function deleteProduct(product) {
     productStore.basket = productStore.basket.filter((p) => p.id != product.id);
   }
 }
-
-function addComment() {
-  product.value.comments.push(newComment.value);
-  console.log(newComment.value)
-  newComment.value = {
-    nameUser: productStore.nameUser + " " + productStore.surnameUser,
-    img: null,
-    text: "",
-    rate: "0",
-  };
-}
 </script>
 
 <style lang="scss" scoped>
@@ -218,6 +203,13 @@ function addComment() {
   padding: 10px 0px;
   width: 40vw;
   font-size: 2vh;
+}
+
+.admin-btns {
+  margin: 3vh 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .name-and-rate {
@@ -263,37 +255,6 @@ function addComment() {
   font-weight: 500;
 }
 
-.new-comment-btn{
-  &:hover {
-    background-color: #FF3C00;
-    color: white;
-  }
-}
-.new-comment {
-  padding: 20px;
-  width: 25vw;
-  min-height: 25vh;
-  align-self: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.stars {
-  display: flex;
-  flex-direction: row;
-  font-size: x-large;
-}
-
-.img-input {
-  width: 23vw;
-}
-
-.text-input {
-  width: 23vw;
-}
-
 .comments {
   display: flex;
   flex-direction: column;
@@ -322,8 +283,17 @@ function addComment() {
   font-size: large;
 }
 
+.comment-imgs {
+  display: flex;
+  gap: 10px;
+  font-size: xx-large;
+  align-items: center;
+  color: gray;
+}
+
 .comment-img {
-  max-width: 10vw;
+  max-width: 15vw;
   background-size: cover;
+  cursor: pointer;
 }
 </style>

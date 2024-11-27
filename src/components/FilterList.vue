@@ -16,47 +16,10 @@
 
 <script setup>
 import FilterItem from "./FilterItem.vue";
-import { ref } from "vue";
 import { useProductStore } from "../store/productStore";
 
 const productStore = useProductStore();
 
-const availabilitys = ref(["В наличии", "Мало", "Нет в наличии"]);
-const prices = ref([
-  {
-    min: 0,
-    max: 1000,
-    value: "до 1000",
-  },
-  {
-    min: 1001,
-    max: 2000,
-    value: "1000 — 2000",
-  },
-  {
-    min: 2001,
-    max: 5000,
-    value: "2000 — 5000",
-  },
-  {
-    min: 5001,
-    max: 10000,
-    value: "5000 — 10000",
-  },
-  {
-    min: 10001,
-    max: 50000,
-    value: "10000 — 50000",
-  },
-  {
-    min: 50000,
-    max: 100000,
-    value: "от 50000",
-  },
-]);
-let priceSelection = ref(prices.value);
-let guarantees = ref(["Есть", "Нет"]);
-let isGuarantee = ref("");
 </script>
 
 <style lang="scss" scoped>

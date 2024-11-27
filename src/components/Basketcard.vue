@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { defineProps } from "vue";
 import { useProductStore } from "../store/productStore";
 
 const productStore = useProductStore();

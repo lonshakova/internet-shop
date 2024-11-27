@@ -1,0 +1,61 @@
+import { defineStore } from "pinia";
+
+export const useUserStore = defineStore({
+  id: "users",
+  state: () => ({
+    isEntered: false,
+    enterUser: {
+      id: null,
+      name: "",
+      surname: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+      basket: [],
+      basketForBuying: [],
+    },
+    users: [
+      {
+        id: 5664,
+        name: "Борис",
+        surname: "Пончиков",
+        email: "donat.b@boris.com",
+        password: "12345678",
+        isAdmin: true,
+        basket: [],
+        basketForBuying: [],
+      },
+      {
+        id: 4553,
+        name: "Ирина",
+        surname: "Кышкова",
+        email: "irish_kish@kish.ru",
+        password: "11111111",
+        isAdmin: false,
+        basket: [],
+        basketForBuying: [],
+      },
+      {
+        id: 3442,
+        name: "Марина",
+        surname: "Шишина",
+        email: "nepishi@ire.com",
+        password: "22222222",
+        isAdmin: false,
+        basket: [],
+        basketForBuying: [],
+      },
+      {
+        id: 2331,
+        name: "Николай",
+        surname: "Решетников",
+        email: "kakoito@chel.ru",
+        password: "55555555",
+        isAdmin: false,
+        basket: [],
+        basketForBuying: [],
+      },
+    ],
+  }),
+  actions: {},
+});

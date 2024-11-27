@@ -15,7 +15,7 @@
           <div><u>Количество товаров</u>: {{ totalBasket }}</div>
           <div><u>Итого</u>: {{ totalAmount }}</div>
         </div>
-        <v-btn class="btn" v-if="productStore.isEntered">Оформить заказ</v-btn>
+        <v-btn class="btn" v-if="userStore.isEntered">Оформить заказ</v-btn>
         <div class="alt-text" v-else>Войдите для заказа</div>
       </v-card>
       <div v-else class="backup-text">
@@ -29,9 +29,11 @@
 <script setup>
 import Basketcard from "../components/Basketcard.vue";
 import { useProductStore } from "../store/productStore";
-import { computed, readonly } from "vue";
+import { useUserStore } from "../store/userStore";
+import { computed } from "vue";
 
 const productStore = useProductStore();
+const userStore = useUserStore();
 const totalBasket = computed(function () {
   let sum = 0;
   for (let i = 0; i < productStore.basketForBuying.length; i++) {

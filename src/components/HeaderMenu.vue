@@ -6,14 +6,17 @@
     </div>
   </div>
   <div class="btns">
-    <v-btn append-icon="mdi-cart-variant" class="icon" @click="$router.push('/basket')"
+    <v-btn
+      append-icon="mdi-cart-variant"
+      class="icon"
+      @click="$router.push('/basket')"
       >Корзина ({{ totalBasket }})
       <template v-slot:append>
         <v-icon color="var(--icons-color)" size="25px" />
       </template>
     </v-btn>
     <v-btn
-      v-if="!productStore.isEntered"
+      v-if="!userStore.isEntered"
       append-icon="mdi-account-outline"
       class="enter"
       @click="$router.push('/login')"
@@ -24,34 +27,46 @@
     </v-btn>
     <div class="enter-and-fio" v-else>
       <div class="fio">{{ fio }}</div>
-      <v-icon color="var(--icons-color)" size="25px" icon="mdi-account-outline"/>
-      <v-btn
-        class="enter"
-        @click="productStore.isEntered = !productStore.isEntered"
-        >Выйти
-      </v-btn>
+      <v-icon
+        color="var(--icons-color)"
+        size="25px"
+        icon="mdi-account-outline"
+      />
+      <v-btn class="enter" @click="goOut()">Выйти </v-btn>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useUserStore } from "../store/userStore";
 import { useProductStore } from "../store/productStore";
 import { computed } from "vue";
 
 const productStore = useProductStore();
+const userStore = useUserStore();
 
 const fio = computed(
-  () => productStore.nameUser[0] + "." + productStore.surnameUser
+  () => userStore.enterUser.name[0] + "." + userStore.enterUser.surname
 );
-const totalBasket = computed(
-  function() {
-    let sum = 0;
-    for (let i = 0; i < productStore.products.length; i++) {
-      sum += productStore.products[i].basket;
-    }
-    return sum;
+const totalBasket = computed(function () {
+  let sum = 0;
+  for (let i = 0; i < productStore.products.length; i++) {
+    sum += productStore.products[i].basket;
   }
-);
+  return sum;
+});
+
+function goOut() {
+  userStore.isEntered = false;
+  userStore.enterUser = {
+    id: null,
+    name: "",
+    surname: "",
+    email: "",
+    password: "",
+    isAdmin: false,
+  };
+}
 </script>
 
 <style lang="scss" scoped>
