@@ -28,7 +28,7 @@ export const useUserStore = defineStore({
       {
         id: 4553,
         name: "Ирина",
-        surname: "Кышкова",
+        surname: "Кышкыш",
         email: "irish_kish@kish.ru",
         password: "11111111",
         isAdmin: false,

@@ -10,7 +10,7 @@
       append-icon="mdi-cart-variant"
       class="icon"
       @click="$router.push('/basket')"
-      >Корзина ({{ totalBasket }})
+      >Корзина ({{ totalAmount }})
       <template v-slot:append>
         <v-icon color="var(--icons-color)" size="25px" />
       </template>
@@ -48,7 +48,7 @@ const userStore = useUserStore();
 const fio = computed(
   () => userStore.enterUser.name[0] + "." + userStore.enterUser.surname
 );
-const totalBasket = computed(function () {
+const totalAmount = computed(function () {
   let sum = 0;
   for (let i = 0; i < productStore.products.length; i++) {
     sum += productStore.products[i].basket;
@@ -59,13 +59,15 @@ const totalBasket = computed(function () {
 function goOut() {
   userStore.isEntered = false;
   userStore.enterUser = {
-    id: null,
-    name: "",
-    surname: "",
-    email: "",
-    password: "",
-    isAdmin: false,
-  };
+      id: null,
+      name: "",
+      surname: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+      basket: [],
+      basketForBuying: [],
+    };
 }
 </script>
 

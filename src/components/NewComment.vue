@@ -32,6 +32,8 @@
               class="img-input"
               label="Вставьте картинку"
               accept="image/*"
+              chips
+              multiple
               v-model="newComment.img"
             />
             <v-img :src="newComment.img"></v-img>
@@ -67,7 +69,8 @@ const props = defineProps({ product: { type: Object, required: true } });
 const userStore = useUserStore();
 
 const newComment = ref({
-  user_id: null,
+  customer_id: userStore.enterUser.id,
+  product_id: props.product.id,
   nameUser: userStore.enterUser.name + " " + userStore.enterUser.surname,
   img: [],
   text: "",
@@ -75,10 +78,13 @@ const newComment = ref({
 });
 
 function addComment() {
-  newComment.value.user_id = userStore.enterUser.id;
+  newComment.value.img = newComment.value.img.map((img) =>
+    URL.createObjectURL(img)
+  );
   props.product.comments.unshift(newComment.value);
   newComment.value = {
-    user_id: null,
+    customer_id: userStore.enterUser.id,
+    product_id: props.product.id,
     nameUser: userStore.enterUser.name + " " + userStore.enterUser.surname,
     img: [],
     text: "",

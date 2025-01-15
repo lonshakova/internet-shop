@@ -1,19 +1,25 @@
 <template>
   <div>
     <div class="category">
-      Корзина<span style="color: grey">({{ productStore.basket.length }})</span>
+      Корзина<span style="color: grey"
+        >({{ totalBasket.length }})</span
+      >
     </div>
     <div class="main-content">
       <div>
-        <div v-for="product in productStore.basket" class="list">
-          <Basketcard :product="product" />
+        <div v-for="product in totalBasket" class="list">
+          <BasketCard :product="product" />
         </div>
       </div>
-      <v-card class="total-amount" elevation="12" v-if="productStore.basket.length != 0">
+      <v-card
+        class="total-amount"
+        elevation="12"
+        v-if="totalBasket.length != 0"
+      >
         <div>
           <h3 class="title">Ваш заказ</h3>
-          <div><u>Количество товаров</u>: {{ totalBasket }}</div>
-          <div><u>Итого</u>: {{ totalAmount }}</div>
+          <div><u>Количество товаров</u>: {{ totalAmount }}</div>
+          <div><u>Итого</u>: {{ totalCost }}</div>
         </div>
         <v-btn class="btn" v-if="userStore.isEntered">Оформить заказ</v-btn>
         <div class="alt-text" v-else>Войдите для заказа</div>
@@ -27,32 +33,43 @@
 </template>
 
 <script setup>
-import Basketcard from "../components/Basketcard.vue";
-import { useProductStore } from "../store/productStore";
+import BasketCard from "../components/BasketCard.vue";
 import { useUserStore } from "../store/userStore";
 import { computed } from "vue";
 
-const productStore = useProductStore();
 const userStore = useUserStore();
-const totalBasket = computed(function () {
+
+const totalBasket = computed(function() {
+  if (userStore.isEntered) {
+    return userStore.basket;
+  }
+  else {
+    return JSON.parse(localStorage.getItem("basket")) || [];
+  }
+});
+
+const totalAmount = computed(function () {
   let sum = 0;
-  for (let i = 0; i < productStore.basketForBuying.length; i++) {
-    sum += productStore.basketForBuying[i].basket;
+  for (let i = 0; i < userStore.enterUser.basketForBuying.length; i++) {
+    sum += userStore.enterUser.basketForBuying[i].basket;
   }
   return sum;
 });
-const totalAmount = computed(function () {
+
+const totalCost = computed(function () {
   let sum = 0;
-  for (let i = 0; i < productStore.basketForBuying.length; i++) {
-    if (productStore.isEntered) {
-      sum +=
-        productStore.basketForBuying[i].basket *
-        productStore.basketForBuying[i].price *
-        0.8;
+  for (let i = 0; i < userStore.enterUser.basketForBuying.length; i++) {
+    if (userStore.isEntered && userStore.enterUser.basketForBuying[i].sale!=0) {
+      sum += Math.round
+        (userStore.enterUser.basketForBuying[i].basket *
+          userStore.enterUser.basketForBuying[i].price *
+          (100-userStore.enterUser.basketForBuying[i].sale) /
+          100
+      );
     } else {
       sum +=
-        productStore.basketForBuying[i].basket *
-        productStore.basketForBuying[i].price;
+        userStore.enterUser.basketForBuying[i].basket *
+        userStore.enterUser.basketForBuying[i].price;
     }
   }
   return sum;
@@ -100,7 +117,7 @@ const totalAmount = computed(function () {
 
 .btn {
   &:hover {
-    background: #FF3C00;
+    background: #ff3c00;
     color: white;
   }
 }
@@ -109,6 +126,6 @@ const totalAmount = computed(function () {
   text-transform: uppercase;
   font-size: medium;
   align-self: center;
-  color:#FF3C00;
+  color: #ff3c00;
 }
 </style>

@@ -5,33 +5,42 @@
       <div class="name-and-description">
         <div class="name-and-rate">
           <div class="name">{{ product.name }}</div>
-          <div class="rate">
+          <div class="rate" v-if="rate != 0">
             <v-icon icon="mdi-star" size="default" color="#FF3C00" />{{ rate }}
           </div>
         </div>
         <div class="description">{{ product.description }}</div>
+        <div class="characteristics">
+          <h3>Характеристики</h3>
+          <div v-for="char in product.characteristics">
+            {{ char.name }}:&nbsp{{ char.value }}
+          </div>
+        </div>
       </div>
       <div class="admin-btns" v-if="userStore.enterUser.isAdmin">
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn v-bind="props" :color="isHovering ? '#FF3C00' : undefined"
-              >Редактировать</v-btn
-            >
+        <ChangeProduct :product="product" :btnTitle="'Редактировать'" :isProductNew="false"/>
+        <v-dialog max-width="500">
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn class="admin-btn" text="Удалить" v-bind="activatorProps" />
           </template>
-        </v-hover>
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              v-bind="props"
-              :color="isHovering ? '#FF3C00' : undefined"
-              @click="
-                productStore.deleteProduct(product);
-                $router.push(`/`);
-              "
-              >Удалить</v-btn
-            >
+          <template v-slot:default="{ isActive }">
+            <v-card title="Внимание">
+              <v-card-text> Вы уверены, что хотите удалить товар? </v-card-text>
+              <v-card-actions>
+                <v-btn text="Отмена" @click="isActive.value = false" />
+                <v-btn
+                  text="Удалить"
+                  color="#ff3c00"
+                  @click="
+                    productStore.deleteProduct(product);
+                    $router.push(`/`);
+                    isActive.value = false;
+                  "
+                />
+              </v-card-actions>
+            </v-card>
           </template>
-        </v-hover>
+        </v-dialog>
       </div>
 
       <div class="price-and-btn">
@@ -43,15 +52,15 @@
           >
         </div>
         <div class="status">
-          <span v-if="product.quantity >= 5" style="color: #1e8449"
+          <span v-if="product.amount >= 5" style="color: #1e8449"
             >В наличии</span
           >
           <span
-            v-if="product.quantity < 5 && product.quantity > 0"
+            v-if="product.amount < 5 && product.amount > 0"
             style="color: #ffc300"
             >Мало</span
           >
-          <span v-if="product.quantity == 0" style="color: #c70039"
+          <span v-if="product.amount == 0" style="color: #c70039"
             >Нет в наличии</span
           >
         </div>
@@ -60,7 +69,7 @@
             <v-btn
               v-bind="props"
               :color="isHovering ? '#FF3C00' : undefined"
-              v-if="product.quantity > 0 && product.basket == 0"
+              v-if="product.amount > 0 && product.basket == 0"
               @click="addProdutToBasket(product)"
               >В корзину</v-btn
             >
@@ -78,13 +87,12 @@
           <span class="basket">{{ product.basket }}</span>
           <v-btn
             class="btn"
-            v-if="product.quantity > 0"
+            v-if="product.amount > 0"
             size="small"
             rounded="0"
             icon="mdi-plus"
             @click="
-              product.basket++;
-              product.quantity--;
+              addProdutToBasket(product)
             "
           />
         </div>
@@ -93,54 +101,34 @@
     <div class="comments">
       <div class="comments-header">
         <h2>Комментарии</h2>
-        <NewComment :product="product"/>
+        <v-dialog max-width="500" v-if="yourComment">
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn text="Удалить комментарий" v-bind="activatorProps" />
+          </template>
+          <template v-slot:default="{ isActive }">
+            <v-card title="Внимание">
+              <v-card-text>
+                Вы уверены, что хотите удалить комментарий?
+              </v-card-text>
+              <v-card-actions>
+                <v-btn text="Отмена" @click="isActive.value = false" />
+                <v-btn
+                  color="#ff3c00"
+                  text="Удалить"
+                  @click="
+                    deleteComment();
+                    isActive.value = false;
+                  "
+                />
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
+
+        <NewComment v-else :product="product" />
       </div>
       <div v-for="comment in product.comments">
-        <v-card class="comment" elevation="12">
-          <div class="nameUser" v-if="comment.user_id==userStore.enterUser.id">Ваш комментарий</div>
-          <div class="nameUser" v-else>{{ comment.nameUser }}</div>
-          <div class="comment-content">
-            <div class="text-and-rate">
-              <div class="rate">
-                <v-icon
-                  v-for="i in +comment.rate"
-                  icon="mdi-star"
-                  color="#FF3C00"
-                />
-                {{ comment.rate }}
-              </div>
-              <div class="text" v-if="comment.text">{{ comment.text }}</div>
-            </div>
-            <div class="comment-imgs">
-              <v-dialog max-width="700">
-                <template v-slot:activator="{ props: activatorProps }">
-                  <v-img
-                    v-bind="activatorProps"
-                    class="comment-img"
-                    v-if="comment.img[0]"
-                    :elevation="comment.img.length"
-                    :src="comment.img[0]"
-                  />
-                </template>
-                <template v-slot:default="{ isActive }">
-                  <v-carousel
-                    hide-delimiters
-                    :show-arrows="comment.img.length > 1 ? 'hover' : false"
-                  >
-                    <v-carousel-item
-                      v-for="(img, i) in comment.img"
-                      :key="i"
-                      :src="img"
-                    ></v-carousel-item>
-                  </v-carousel>
-                </template>
-              </v-dialog>
-              <div v-if="comment.img.length > 1">
-                +{{ comment.img.length - 1 }}
-              </div>
-            </div>
-          </div>
-        </v-card>
+        <CommentCard :comment="comment" />
       </div>
     </div>
   </div>
@@ -148,6 +136,8 @@
 
 <script setup>
 import NewComment from "../components/NewComment.vue";
+import ChangeProduct from "../components/ChangeProduct.vue";
+import CommentCard from "../components/CommentCard.vue";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useProductStore } from "../store/productStore";
@@ -157,7 +147,6 @@ const productStore = useProductStore();
 const userStore = useUserStore();
 const route = useRoute();
 
-
 const product = computed(function () {
   return productStore.products.find(function (product) {
     return product.id == route.params.id;
@@ -166,24 +155,73 @@ const product = computed(function () {
 
 const rate = computed(function () {
   let sum = 0;
+  if (product.value.comments.length == 0) {
+    return 0;
+  }
   for (let comment of product.value.comments) {
     sum += +comment.rate;
   }
   return Math.round(sum / product.value.comments.length);
 });
 
+const yourComment = computed(function () {
+  for (let comment of product.value.comments) {
+    if (comment.customer_id == userStore.enterUser.id) {
+      return true;
+    }
+  }
+  return false;
+});
+
 function addProdutToBasket(product) {
   product.basket++;
-  product.quantity--;
-  productStore.basket.push(product);
+  product.amount--;
+  if (userStore.isEntered) {
+    if (product.basket == 1) {
+      userStore.enterUser.basket.push(product);
+    }
+  } else {
+    let basket = JSON.parse(localStorage.getItem("basket")) || [];
+    if (basket.length) {
+      let productFromStorage = basket.find((prod) => prod.id == product.id);
+      if (productFromStorage) {
+        productFromStorage.basket++;
+        productFromStorage.amount--;
+      } else {
+        basket.push(product);
+      }
+    } else {
+      basket.push(product);
+    }
+    localStorage.setItem("basket", JSON.stringify(basket));
+  }
 }
 
 function deleteProduct(product) {
   product.basket--;
-  product.quantity++;
-  if (product.basket == 0) {
-    productStore.basket = productStore.basket.filter((p) => p.id != product.id);
+  product.amount++;
+  if (userStore.isEntered) {
+    if (product.basket == 0) {
+      userStore.enterUser.basket = userStore.enterUser.basket.filter(
+        (p) => p.id != product.id
+      );
+    }
+  } else {
+    let basket = JSON.parse(localStorage.getItem("basket")) || [];
+    let productFromStorage = basket.find((prod) => prod.id == product.id);
+    productFromStorage.basket--;
+    productFromStorage.amount++;
+    if (productFromStorage.basket == 0) {
+      basket = basket.filter((p) => p.id != product.id);
+    }
+    localStorage.setItem("basket", JSON.stringify(basket));
   }
+}
+
+function deleteComment() {
+  product.value.comments = product.value.comments.filter(
+    (comment) => comment.customer_id !== userStore.enterUser.id
+  );
 }
 </script>
 
@@ -212,6 +250,12 @@ function deleteProduct(product) {
   gap: 20px;
 }
 
+.admin-btn {
+  &:hover {
+    color: #ffffff;
+    background-color: #ff3c00;
+  }
+}
 .name-and-rate {
   width: 30vw;
   display: flex;
@@ -265,35 +309,5 @@ function deleteProduct(product) {
   width: 80vw;
   display: flex;
   justify-content: space-between;
-}
-
-.comment {
-  padding: 15px;
-  margin: 5px 0px;
-  width: 80vw;
-}
-
-.nameUser {
-  font-size: large;
-  font-weight: 600;
-}
-
-.rate {
-  display: flex;
-  font-size: large;
-}
-
-.comment-imgs {
-  display: flex;
-  gap: 10px;
-  font-size: xx-large;
-  align-items: center;
-  color: gray;
-}
-
-.comment-img {
-  max-width: 15vw;
-  background-size: cover;
-  cursor: pointer;
 }
 </style>
