@@ -16,7 +16,7 @@ export const useProductStore = defineStore({
         sale: 5,
         basket: 0,
         id: 1,
-        category: ["Сматрфоны"],
+        category_ids: [1, 2],
         characteristics: [
           {
             id: 55,
@@ -63,7 +63,7 @@ export const useProductStore = defineStore({
         sale: 2,
         basket: 0,
         id: 2,
-        category: ["Смартфоны"],
+        category_ids: [1, 2],
         characteristics: [
           {
             id: 55,
@@ -110,7 +110,7 @@ export const useProductStore = defineStore({
         sale: 20,
         basket: 0,
         id: 3,
-        category: ["Смартфоны"],
+        category_ids: [1, 3],
         characteristics: [
           {
             id: 55,
@@ -155,7 +155,7 @@ export const useProductStore = defineStore({
         sale: 0,
         basket: 0,
         id: 4,
-        category: ["Сопутствующие товары", "Аудиотехника", "Наушники"],
+        category_ids: [4, 5, 7],
         characteristics: [
           {
             id: 55,
@@ -202,7 +202,7 @@ export const useProductStore = defineStore({
         sale: 50,
         basket: 0,
         id: 5,
-        category: ["Сопутствующие товары", "Чехлы"],
+        category_ids: [4, 6],
         characteristics: [
           {
             id: 55,
@@ -251,7 +251,7 @@ export const useProductStore = defineStore({
         sale: 10,
         basket: 0,
         id: 6,
-        category: ["Смартфоны"],
+        category_ids: [1],
         characteristics: [
           {
             id: 55,
@@ -289,20 +289,51 @@ export const useProductStore = defineStore({
         ],
       },
     ],
+    categoryProducts: [],
   }),
   getters: {
     sortedProducts(state) {
       if (state.isLowerFirst) {
-        return state.products.sort((prod1, prod2) => prod1.price - prod2.price);
+        return state.categoryProducts.sort(
+          (prod1, prod2) => prod1.price - prod2.price
+        );
       } else {
-        return state.products.sort((prod1, prod2) => prod2.price - prod1.price);
+        return state.categoryProducts.sort(
+          (prod1, prod2) => prod2.price - prod1.price
+        );
       }
     },
-    
   },
   actions: {
+    getProducts(categoryId) {
+      this.categoryProducts = [];
+      if (categoryId) {
+        for (let product of this.products) {
+          if (product.category_ids.find((c) => c == categoryId)) {
+            this.categoryProducts.push(product);
+          }
+        }
+      } else {
+        this.categoryProducts = this.products;
+      }
+    },
+
     deleteProduct(product) {
       this.products = this.products.filter((p) => p.id !== product.id);
+    },
+
+    clearBasket() {
+      window.localStorage.removeItem("basket");
+      for (let i = 0; i < this.products.length; i++) {
+        this.products[i].amount += this.products[i].basket;
+        this.products[i].basket = 0;
+      }
+    },
+    deleteCommentForAdmin(comment) {
+      let product = this.products.find((p) => p.id == comment.product_id);
+      product.comments = product.comments.filter(
+        (com) => com.customer_id != comment.customer_id
+      );
     },
   },
 });

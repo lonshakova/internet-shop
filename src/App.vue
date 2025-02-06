@@ -1,4 +1,3 @@
-<
 <template>
   <v-app>
     <v-app-bar :elevation="2" scroll-behavior="elevate">
@@ -15,7 +14,7 @@ import HeaderMenu from "./components/HeaderMenu.vue";
 </script>
 
 <style lang="scss" scoped>
-*{
-  --icons-color: #FF3C00;
+* {
+  --icons-color: #ff3c00;
 }
 </style>

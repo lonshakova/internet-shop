@@ -2,7 +2,8 @@
   <div class="content">
     <div class="category-filter">
       <div class="category">
-        Главная<span style="color: grey"
+        {{ categoryStore.path[categoryStore.path.length-1] }}
+        <span style="color: grey"
           >({{ productStore.sortedProducts.length }})</span
         >
       </div>
@@ -38,10 +39,12 @@ import { ref } from "vue";
 import { useProductStore } from "../store/productStore";
 import { useUserStore } from "../store/userStore";
 import { useFilterStore } from "../store/filterStore";
+import { useCategoryStore } from "../store/categoryStore";
 
 const userStore = useUserStore();
 const productStore = useProductStore();
 const filterStor = useFilterStore();
+const categoryStore = useCategoryStore();
 
 const newProduct = ref({
   name: "",
@@ -52,7 +55,7 @@ const newProduct = ref({
   sale: 0,
   basket: 0,
   id: null,
-  category: [],
+  category: null,
   characteristics: filterStor.chars.map((ch) => {
     return { name: ch.name, value: "" };
   }),

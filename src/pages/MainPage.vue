@@ -1,23 +1,10 @@
 <template>
   <div class="main">
     <div class="main-header">
-      <v-dialog width="auto">
-        <template v-slot:activator="{ props: activatorProps }">
-          <v-btn
-            class="btn"
-            variant="text"
-            v-bind="activatorProps"
-            size="x-large"
-            rounded="xl"
-            color="var(--icons-color)"
-            >Каталог</v-btn
-          >
-        </template>
-        <template v-slot:default="{ isCatalogVisible }">
-          <ProductCatalog />
-        </template>
-      </v-dialog>
-      <div class="path">Главная/</div>
+      <ProductCatalog />
+      <div class="path">
+        <v-breadcrumbs :items="categoryStore.path" />
+      </div>
     </div>
     <div class="main-content">
       <div><FilterList /></div>
@@ -30,20 +17,26 @@
 import ProductList from "../components/ProductList.vue";
 import ProductCatalog from "../components/ProductCatalog.vue";
 import FilterList from "../components/FilterList.vue";
+import { useCategoryStore } from "../store/categoryStore";
+import { useProductStore } from "../store/productStore";
+import { onBeforeMount } from "vue";
+import { useRoute } from "vue-router";
 
+const categoryStore = useCategoryStore();
+const productStore = useProductStore();
+const route = useRoute();
+
+
+onBeforeMount(()=>{
+  productStore.getProducts(route.params.id);
+})
 </script>
 
 <style lang="scss" scoped>
-
 .main-header {
   margin: 1vh;
   display: flex;
   align-items: center;
-}
-
-.btn {
-  font-size: 4vh;
-  font-weight: 700;
 }
 
 .path {

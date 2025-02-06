@@ -1,88 +1,104 @@
 <template>
   <div>
-    <v-card class="catalog-card">
-      <div class="title">
-        Каталог
-      </div>
-      <v-list class="catalog-list">
-        <v-list-group value="Smartphones">
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" class="category" @click="formWay('Смартфоны')">Смартфоны</v-list-item>
-          </template>
-          <v-list-item
-            v-for="smartphone in smartphones"
-            :key="smartphone.id"
-            :value="smartphone.id"
-            @click="endType(smartphone)"
-          >{{smartphone.title}}</v-list-item>
-          <v-list-group value="RelatedProducts">
-            <template v-slot:activator="{ props }">
-              <v-list-item v-bind="props" class="category" @click="formWay('Сопутствующие товары')">Сопутствующие товары</v-list-item>
+    <v-dialog width="auto">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-btn
+          class="btn"
+          variant="text"
+          v-bind="activatorProps"
+          size="x-large"
+          rounded="xl"
+          color="var(--icons-color)"
+          >Каталог</v-btn
+        >
+      </template>
+      <template v-slot:default="{ isActive }">
+        <v-card class="catalog-card">
+          <div class="title">Каталог</div>
+          <v-treeview
+            class="tree"
+            :items="categories"
+            item.title="name"
+            item-value="id"
+            color="#ff3c00"
+            activatable
+            v-model:opened="open"
+            v-model:activated="selection"
+            select-strategy="single-leaf"
+            @click="
+              goToMain();
+              isActive.value = false;
+            "
+          >
+            <template v-slot:prepend="{ item }">
+              {{ item.name }}
             </template>
-            <v-list-item
-              v-for="rel in related"
-              :key="rel.id"
-              :value="rel.id"
-              @click="endType(rel)"
-            >{{rel.title}}</v-list-item>
-          </v-list-group>
-        </v-list-group>
-        
-        <v-list-group value="Audio">
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" class="category" @click="formWay('Аудиотехника')">Аудиотехника</v-list-item>
-          </template>
-          <v-list-item
-            v-for="audio in audious"
-            :key="audio.id"
-            :value="audio.id"
-            @click="endType(audio)"
-          >{{audio.title}}</v-list-item>
-  
-        </v-list-group>
-        
-      </v-list>
-    </v-card>
+          </v-treeview>
+        </v-card>
+      </template>
+    </v-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useCategoryStore } from "../store/categoryStore";
+import { useProductStore } from "../store/productStore";
+import { useRouter } from "vue-router";
 
-let smartphones = ref([
-  { title: "Все", value: "", id: 0 },
-  { title: "Apple", value: "apple", id: 1 },
-  { title: "Samsung", value: "samsung", id: 2 },
-]);
-let related = ref([
-  { title: "Все", value: "", id: 10 },
-  { title: "Наушники", value: "headphones", id: 11 },
-  { title: "Чехлы", value: "cases", id: 12 },
-]);
-let audious = ref([
-  { title: "Все", value: "", id: 20 },
-  { title: "Портативные колонки", value: "speakers", id: 21 },
-  { title: "Наушники", value: "headphones", id: 22 },
-]);
-let path = "";
-let mainpath = "";
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const router = useRouter();
 
-function formWay (title){
-  if (title != 'Сопутствующие товары') {
-    mainpath = '' + title;
+let open = ref([]);
+let selection = ref([]);
+
+let categories = computed(() => {
+  let cats = [];
+  for (let category of categoryStore.categories) {
+    if (!category.parent_ids) {
+      findChilds(category);
+      cats.push(category);
+    }
   }
-  else {
-    mainpath += "/" + title;
+  return cats;
+});
+
+function findChilds(category) {
+  let children = [];
+  for (let childId of category.childs_id) {
+    let child = categoryStore.categories.find((c) => c.id == childId);
+    if (child.childs_id) {
+      findChilds(child);
+    }
+    children.push(child);
   }
+  category.children = children;
 }
 
-function endType(type){
-  path = mainpath + "/" + type.title;
-}
+function goToMain(categoryId) {
+  categoryStore.path = ["Главная"];
+  let cat;
+  for (let item of this.open) {
+    cat = categoryStore.categories.find((c) => c.id == item);
+    categoryStore.path.push(cat.name);
+  }
+  if (this.selection[0]!=cat.id){
+    cat = categoryStore.categories.find((c) => c.id == this.selection[0]);
+    categoryStore.path.push(cat.name);
+  }
+  productStore.getProducts(this.selection[0]);
+  router.push(`/category/${this.selection[0]}`);
 
+}
 </script>
 
 <style lang="scss" scoped>
+.btn {
+  font-size: 4vh;
+  font-weight: 700;
+}
+
 .catalog-card {
   padding-top: 7vh;
   width: 30vw;
@@ -96,15 +112,11 @@ function endType(type){
   font-size: 40px;
   font-weight: 700;
   color: #c70000;
-
 }
 
-.catalog-list {
+.tree {
   width: 20vw;
-}
-
-.category{
-  font-size: 2vh;
-  color: #FF3C00;
+  font-size: 20px;
 }
 </style>
+

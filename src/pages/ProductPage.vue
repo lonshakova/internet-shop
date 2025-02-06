@@ -64,38 +64,8 @@
             >Нет в наличии</span
           >
         </div>
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-            <v-btn
-              v-bind="props"
-              :color="isHovering ? '#FF3C00' : undefined"
-              v-if="product.amount > 0 && product.basket == 0"
-              @click="addProdutToBasket(product)"
-              >В корзину</v-btn
-            >
-          </template>
-        </v-hover>
-        <div class="basket-btns" v-if="product.basket > 0">
-          <v-btn
-            class="btn"
-            v-if="product.basket != 0"
-            size="small"
-            rounded="0"
-            icon="mdi-minus"
-            @click="deleteProduct(product)"
-          />
-          <span class="basket">{{ product.basket }}</span>
-          <v-btn
-            class="btn"
-            v-if="product.amount > 0"
-            size="small"
-            rounded="0"
-            icon="mdi-plus"
-            @click="
-              addProdutToBasket(product)
-            "
-          />
-        </div>
+        
+        <PlusMinusBtns :product="product" />
       </div>
     </div>
     <div class="comments">
@@ -138,6 +108,7 @@
 import NewComment from "../components/NewComment.vue";
 import ChangeProduct from "../components/ChangeProduct.vue";
 import CommentCard from "../components/CommentCard.vue";
+import PlusMinusBtns from "../components/PlusMinusBtns.vue";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useProductStore } from "../store/productStore";
@@ -172,51 +143,6 @@ const yourComment = computed(function () {
   }
   return false;
 });
-
-function addProdutToBasket(product) {
-  product.basket++;
-  product.amount--;
-  if (userStore.isEntered) {
-    if (product.basket == 1) {
-      userStore.enterUser.basket.push(product);
-    }
-  } else {
-    let basket = JSON.parse(localStorage.getItem("basket")) || [];
-    if (basket.length) {
-      let productFromStorage = basket.find((prod) => prod.id == product.id);
-      if (productFromStorage) {
-        productFromStorage.basket++;
-        productFromStorage.amount--;
-      } else {
-        basket.push(product);
-      }
-    } else {
-      basket.push(product);
-    }
-    localStorage.setItem("basket", JSON.stringify(basket));
-  }
-}
-
-function deleteProduct(product) {
-  product.basket--;
-  product.amount++;
-  if (userStore.isEntered) {
-    if (product.basket == 0) {
-      userStore.enterUser.basket = userStore.enterUser.basket.filter(
-        (p) => p.id != product.id
-      );
-    }
-  } else {
-    let basket = JSON.parse(localStorage.getItem("basket")) || [];
-    let productFromStorage = basket.find((prod) => prod.id == product.id);
-    productFromStorage.basket--;
-    productFromStorage.amount++;
-    if (productFromStorage.basket == 0) {
-      basket = basket.filter((p) => p.id != product.id);
-    }
-    localStorage.setItem("basket", JSON.stringify(basket));
-  }
-}
 
 function deleteComment() {
   product.value.comments = product.value.comments.filter(

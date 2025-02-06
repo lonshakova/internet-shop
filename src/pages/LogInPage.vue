@@ -1,74 +1,73 @@
 <
 <template>
-  <div class="login-page">
+  <div class="login-page" >
     <v-card class="login-card" elevation="16">
-      <v-form class="log-in-form">
+      <v-form class="log-in-form" v-if="!userStore.isEntered">
         <div>
           <v-text-field
-          class="login"
-          label="Email"
-          type="email"
-          required
-          v-model="user.email"
-        />
-        <v-text-field
-          class="password"
-          label="Пароль"
-          required
-          v-model="user.password"
-          :type="isVisible ? 'text' : 'password'"
-          :append-inner-icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append-inner="isVisible = !isVisible"
-        />
+            class="login"
+            label="Email"
+            type="email"
+            required
+            v-model="user.email"
+          />
+          <v-text-field
+            class="password"
+            label="Пароль"
+            required
+            v-model="user.password"
+            :type="isVisible ? 'text' : 'password'"
+            :append-inner-icon="isVisible ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append-inner="isVisible = !isVisible"
+          />
         </div>
-        
+        <div v-if="isError" class="error-message">
+          Неверный email или пароль
+        </div>
+
         <div class="btns">
           <v-btn
             class="btn"
             variant="plain"
             @click="$router.push('/signup')"
             color="#FF3C00"
-            >Регистрация</v-btn
-          >
-          <v-btn class="btn" variant="plain" @click="enterUser(user)">Вход</v-btn>
+            text="Регистрация"
+          />
+          <v-btn
+            class="btn"
+            variant="plain"
+            @click="userStore.enterUser(user)"
+            text="Вход"
+          />
         </div>
       </v-form>
+      <div class="success" v-else>
+        Вход выполняется
+        <v-progress-circular indeterminate/>
+      </div>
     </v-card>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
 import { useUserStore } from "../store/userStore";
 
 const userStore = useUserStore();
-const router = useRouter();
-
 
 let isVisible = ref(false);
+
+let isError = ref(false);
+
 const user = ref({
-      id:null,
-      name:"",
-      surname:"",
-      email:"",
-      password:"",
-      isAdmin:false,
-    })
-
-function enterUser(user) {
-      let ind;
-      for (ind in userStore.users){
-        if (userStore.users[ind].email == user.email && userStore.users[ind].password == user.password){
-          userStore.enterUser = userStore.users[ind];
-          userStore.isEntered = true;
-          router.push('/');
-          break
-        }
-      }
-    }
-
+  id: null,
+  name: "",
+  surname: "",
+  email: "",
+  password: "",
+  isAdmin: false,
+});
 </script>
 
 <style lang="scss" scoped>
@@ -95,6 +94,10 @@ function enterUser(user) {
   justify-content: space-between;
 }
 
+.error-message {
+  color: #ff3c00;
+}
+
 .btns {
   display: flex;
   justify-content: flex-end;
@@ -102,5 +105,14 @@ function enterUser(user) {
 
 .btn {
   margin-left: 10px;
+}
+
+.success {
+  margin-top: 20%;
+  color: #1e8449;
+  font-size: xx-large;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

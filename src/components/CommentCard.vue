@@ -29,7 +29,7 @@
                 <v-btn
                   text="Удалить"
                   @click="
-                    deleteComment(product);
+                    productStore.deleteCommentForAdmin(comment);
                     isActive.value = false;
                   "
                 />
@@ -88,15 +88,6 @@ import { useProductStore } from "../store/productStore";
 const userStore = useUserStore();
 const productStore = useProductStore();
 const props = defineProps({ comment: { type: Object, required: true } });
-
-function deleteComment() {
-  let product = productStore.products.find(
-    (p) => p.id == props.comment.product_id
-  );
-  product.comments = product.comments.filter(
-    (com) => com.customer_id != props.comment.customer_id
-  );
-}
 </script>
 
 <style lang="scss" scoped>

@@ -12,6 +12,10 @@ const routes = [
     component: MainPage
   },
   {
+    path: '/category/:id',
+    component: MainPage
+  },
+  {
     path: '/login',
     component: LogInPage
   },

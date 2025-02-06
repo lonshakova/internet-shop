@@ -1,6 +1,6 @@
 <template>
   <div class="header-menu">
-    <div class="logo-and-name" @click="$router.push('/')">
+    <div class="logo-and-name" @click="$router.push('/'); productStore.getProducts('')">
       <img src="/public/logo.png" class="logo" />
       <div class="name">The Best Shop</div>
     </div>
@@ -32,7 +32,38 @@
         size="25px"
         icon="mdi-account-outline"
       />
-      <v-btn class="enter" @click="goOut()">Выйти </v-btn>
+
+      <v-dialog max-width="500">
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-btn class="enter" v-bind="activatorProps" text="Выйти" />
+        </template>
+
+        <template v-slot:default="{ isActive }">
+          <v-card>
+            <v-card-title> Выход из аккаунта </v-card-title>
+            <v-card-text>
+              Вы действительно хотите выйти из аккаунта?
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn
+                text="Нет"
+                variant="text"
+                @click="isActive.value = false"
+              />
+              <v-btn
+                variant="text"
+                color="#ff3c00"
+                text="Да"
+                @click="
+                  isActive.value = false;
+                  userStore.goOut();
+                "
+              />
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -40,7 +71,7 @@
 <script setup>
 import { useUserStore } from "../store/userStore";
 import { useProductStore } from "../store/productStore";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 const productStore = useProductStore();
 const userStore = useUserStore();
@@ -50,25 +81,19 @@ const fio = computed(
 );
 const totalAmount = computed(function () {
   let sum = 0;
-  for (let i = 0; i < productStore.products.length; i++) {
-    sum += productStore.products[i].basket;
+  for (let product of productStore.products) {
+    sum += product.basket;
   }
   return sum;
 });
 
-function goOut() {
-  userStore.isEntered = false;
-  userStore.enterUser = {
-      id: null,
-      name: "",
-      surname: "",
-      email: "",
-      password: "",
-      isAdmin: false,
-      basket: [],
-      basketForBuying: [],
-    };
-}
+onMounted(() => {
+  let userId = window.localStorage.getItem("userId");
+  if (userId) {
+    userStore.enterUser = userStore.users.find((u) => u.id == userId);
+    userStore.isEntered = true;
+  }
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="sigup-page">
     <v-card class="sigup-card" elevation="16">
-      <v-form class="sigup-form" v-if="!isSuccess">
+      <v-form class="sigup-form" v-if="!userStore.isEntered">
         <div>
           <div class="name-and-surname">
             <v-text-field
@@ -54,7 +54,7 @@
             class="btn"
             :variant="isformReady ? 'text' : 'plain'"
             :disabled="!isformReady"
-            @click="registUser()"
+            @click="userStore.registUser(user)"
             :color="isformReady ? '#FF3C00' : 'default'"
             >Регистрация</v-btn
           >
@@ -84,9 +84,14 @@ let rules = ref({
 let isVisible = ref(false);
 let isVisibleRep = ref(false);
 let isSuccess = ref(false);
-let isformReady = computed (() => {
-  return user.value.name && user.value.surname && user.value.email && user.value.password;
-})
+let isformReady = computed(() => {
+  return (
+    user.value.name &&
+    user.value.surname &&
+    user.value.email &&
+    user.value.password
+  );
+});
 const user = ref({
   id: null,
   name: "",
@@ -108,18 +113,18 @@ async function registUser() {
   }
   if (!isError) {
     user.value.id = Date.now();
-    isSuccess.value = !isSuccess.value;
+    isSuccess.value = true;
     userStore.isEntered = true;
     userStore.users.push(user.value);
     userStore.enterUser = user.value;
     user.value = {
       id: null,
-  name: "",
-  surname: "",
-  email: "",
-  password: "",
-  isAdmin: false,
-    }
+      name: "",
+      surname: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+    };
     setTimeout(() => router.push("/"), 1000);
   }
 }

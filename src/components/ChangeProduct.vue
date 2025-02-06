@@ -10,6 +10,7 @@
             class="input"
             label="Название товара"
             v-model="copyProduct.name"
+            :rules="rules"
           />
           <v-textarea
             class="input"
@@ -75,7 +76,8 @@
             />
             <v-btn
               variant="text"
-              color="#ff3c00"
+              :color="isValid ? '#ff3c00' : 'default'"
+              :readonly="!isValid"
               @click="
                 isActive.value = false;
                 isProductNew ? addProduct() : applyChanges();
@@ -90,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, computed } from "vue";
 import { useFilterStore } from "../store/filterStore";
 import { useProductStore } from "../store/productStore";
 
@@ -101,6 +103,19 @@ const props = defineProps({
   btnTitle: { type: String, required: true },
   isProductNew: { type: Boolean, required: true },
 });
+
+let isValid = computed(
+  () =>
+    copyProduct.value.name &&
+    copyProduct.value.description &&
+    copyProduct.value.img &&
+    copyProduct.value.amount &&
+    copyProduct.value.price &&
+    copyProduct.value.category
+);
+
+const rules = [(v) => !!v || "Обязательное поле"];
+
 let copyProduct = ref({
   id: props.product.id,
   name: props.product.name,
@@ -116,7 +131,6 @@ let copyProduct = ref({
 let characteristics = ref(
   props.product.characteristics.map((obj) => ({ ...obj }))
 );
-
 
 function deleteChanges() {
   copyProduct.value = {
@@ -135,13 +149,13 @@ function deleteChanges() {
 }
 
 function addProduct() {
-  console.log(productStore.products);
   copyProduct.value.id = Date.now();
   copyProduct.value.img = URL.createObjectURL(copyProduct.value.img);
   copyProduct.value.characteristics = characteristics.value.map((obj) => ({
     ...obj,
   }));
   productStore.products.push(copyProduct.value);
+  deleteChanges();
 }
 
 function applyChanges() {

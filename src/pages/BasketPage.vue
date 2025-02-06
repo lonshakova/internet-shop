@@ -1,27 +1,47 @@
 <template>
   <div>
     <div class="category">
-      Корзина<span style="color: grey"
-        >({{ totalBasket.length }})</span
-      >
+      Корзина<span style="color: grey">({{ basketList.length }})</span>
     </div>
     <div class="main-content">
       <div>
-        <div v-for="product in totalBasket" class="list">
+        <div v-for="product in basketList" class="list">
           <BasketCard :product="product" />
         </div>
       </div>
-      <v-card
-        class="total-amount"
-        elevation="12"
-        v-if="totalBasket.length != 0"
-      >
+      <v-card class="total-amount" elevation="12" v-if="basketList.length != 0">
         <div>
           <h3 class="title">Ваш заказ</h3>
           <div><u>Количество товаров</u>: {{ totalAmount }}</div>
           <div><u>Итого</u>: {{ totalCost }}</div>
         </div>
-        <v-btn class="btn" v-if="userStore.isEntered">Оформить заказ</v-btn>
+        <v-dialog max-width="500" v-if="userStore.isEntered">
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn
+              v-bind="activatorProps"
+              class="btn"
+              text="Оформить заказ"
+              @click="userStore.placeOrder(totalBasket)"
+              :readonly="totalAmount == 0"
+              :variant="totalAmount == 0 ? 'flat' : 'elevated'"
+            />
+          </template>
+          <template v-slot:default="{ isActive }">
+            <v-card title="Спасибо за заказ!">
+              <v-card-text>
+                На вашу почту было отправлено письмо с подтверждением заказа.
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text="Ok"
+                  @click="isActive.value = false"
+                  color="#FF3C00"
+                />
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
         <div class="alt-text" v-else>Войдите для заказа</div>
       </v-card>
       <div v-else class="backup-text">
@@ -35,16 +55,18 @@
 <script setup>
 import BasketCard from "../components/BasketCard.vue";
 import { useUserStore } from "../store/userStore";
-import { computed } from "vue";
+import { useProductStore } from "../store/productStore";
+import { ref, computed, onBeforeMount } from "vue";
 
 const userStore = useUserStore();
+const productStore = useProductStore();
 
-const totalBasket = computed(function() {
+let totalBasket = ref([]);
+let basketList = computed(() => {
   if (userStore.isEntered) {
-    return userStore.basket;
-  }
-  else {
-    return JSON.parse(localStorage.getItem("basket")) || [];
+    return totalBasket.value;
+  } else {
+    return totalBasket.value.filter((p) => p.basket > 0);
   }
 });
 
@@ -59,11 +81,14 @@ const totalAmount = computed(function () {
 const totalCost = computed(function () {
   let sum = 0;
   for (let i = 0; i < userStore.enterUser.basketForBuying.length; i++) {
-    if (userStore.isEntered && userStore.enterUser.basketForBuying[i].sale!=0) {
-      sum += Math.round
+    if (
+      userStore.isEntered &&
+      userStore.enterUser.basketForBuying[i].sale != 0
+    ) {
+      sum += Math.round(
         (userStore.enterUser.basketForBuying[i].basket *
           userStore.enterUser.basketForBuying[i].price *
-          (100-userStore.enterUser.basketForBuying[i].sale) /
+          (100 - userStore.enterUser.basketForBuying[i].sale)) /
           100
       );
     } else {
@@ -73,6 +98,34 @@ const totalCost = computed(function () {
     }
   }
   return sum;
+});
+
+function placeOrder() {
+  for (let prod of userStore.enterUser.basketForBuying) {
+    for (let p of productStore.products) {
+      if (p.id == prod.id) {
+        p.basket = 0;
+      }
+    }
+    totalBasket.value = totalBasket.value.filter((p) => p.id != prod.id);
+    userStore.enterUser.basketForBuying = [];
+  }
+}
+
+onBeforeMount(() => {
+  if (userStore.isEntered) {
+    totalBasket.value = userStore.enterUser.basket;
+  } else {
+    let bas = JSON.parse(localStorage.getItem("basket")) || [];
+    for (let prod of bas) {
+      console.log(prod);
+      if (productStore.products.find((p) => p.id == prod.id)) {
+        totalBasket.value.push(
+          productStore.products.find((p) => p.id == prod.id)
+        );
+      }
+    }
+  }
 });
 </script>
 

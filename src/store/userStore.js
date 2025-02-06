@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useProductStore } from "./productStore";
 
 export const useUserStore = defineStore({
   id: "users",
@@ -31,7 +32,7 @@ export const useUserStore = defineStore({
         surname: "Кышкыш",
         email: "irish_kish@kish.ru",
         password: "11111111",
-        isAdmin: false,
+        isAdmin: true,
         basket: [],
         basketForBuying: [],
       },
@@ -57,5 +58,79 @@ export const useUserStore = defineStore({
       },
     ],
   }),
-  actions: {},
+  getters: {},
+  actions: {
+    async enterUser(user) {
+      const productStore = useProductStore();
+      let ind;
+      for (ind in this.users) {
+        if (
+          this.users[ind].email == user.email &&
+          this.users[ind].password == user.password
+        ) {
+          this.enterUser = this.users[ind];
+          this.isEntered = true;
+          productStore.clearBasket();
+          window.localStorage.setItem("userId", this.users[ind].id);
+          this.router.push("/");
+          break;
+        }
+      }
+    },
+
+    async registUser(user) {
+      let isError = false;
+      for (let ind in this.users) {
+        if (this.users[ind].email == user.email) {
+          alert("Такой пользователь уже зарегестрирован!");
+          isError = true;
+          break;
+        }
+      }
+      if (!isError) {
+        user.id = Date.now();
+        this.isEntered = true;
+        this.users.push(user);
+        this.enterUser = user;
+        user = {
+          id: null,
+          name: "",
+          surname: "",
+          email: "",
+          password: "",
+          isAdmin: false,
+        };
+        setTimeout(() => this.router.push("/"), 1000);
+      }
+    },
+
+    goOut() {
+      const productStore = useProductStore();
+      this.isEntered = false;
+      productStore.clearBasket();
+      window.localStorage.removeItem("userId");
+      this.enterUser = {
+        id: null,
+        name: null,
+        surname: null,
+        email: null,
+        password: null,
+        isAdmin: false,
+        basket: null,
+        basketForBuying: null,
+      }
+    },
+    placeOrder(totalBasket) {
+      const productStore = useProductStore();
+      for (let prod of this.enterUser.basketForBuying) {
+        for (let p of productStore.products) {
+          if (p.id == prod.id) {
+            p.basket = 0;
+          }
+        }
+        totalBasket.value = totalBasket.value.filter((p) => p.id != prod.id);
+        this.enterUser.basketForBuying = [];
+      }
+    },
+  },
 });
